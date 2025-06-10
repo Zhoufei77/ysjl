@@ -6,15 +6,17 @@
     <title>健康营养追踪</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="lang.js"></script>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>健康营养追踪</h1>
-            <p class="subtitle">三分练，七分吃</p>
+            <h1 data-lang="title">健康营养追踪</h1>
+            <p class="subtitle" data-lang="subtitle">三分练，七分吃</p>
             <div class="header-controls">
-                <button id="show-date-selector" class="control-btn">日期选择</button>
-                <button id="show-goals-settings" class="control-btn">目标设置</button>
+                <button id="show-date-selector" class="control-btn" data-lang="date-selector">日期选择</button>
+                <button id="show-goals-settings" class="control-btn" data-lang="goals-settings">目标设置</button>
+                <button id="lang-switch" class="control-btn">English</button>
             </div>
         </header>
 
@@ -23,15 +25,15 @@
             <div id="date-selector-modal" class="modal">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h2>日期选择</h2>
+                        <h2 data-lang="modal-date">日期选择</h2>
                         <span class="close-modal">&times;</span>
                     </div>
                     <div class="modal-body">
                         <div class="date-controls">
-                            <button id="prev-date">上一天</button>
+                            <button id="prev-date" data-lang="prev-date">上一天</button>
                             <input type="date" id="current-date">
-                            <button id="next-date">下一天</button>
-                            <button id="today-btn">今天</button>
+                            <button id="next-date" data-lang="next-date">下一天</button>
+                            <button id="today-btn" data-lang="today">今天</button>
                         </div>
                     </div>
                 </div>
@@ -41,29 +43,29 @@
             <div id="goals-settings-modal" class="modal">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h2>营养目标设置</h2>
+                        <h2 data-lang="modal-goals">营养目标设置</h2>
                         <span class="close-modal">&times;</span>
                     </div>
                     <div class="modal-body">
                         <div class="goals-form">
                             <div class="form-group">
-                                <label for="protein-goal">蛋白质目标 (克):</label>
+                                <label for="protein-goal" data-lang="protein-goal-label">蛋白质目标 (克):</label>
                                 <input type="number" id="protein-goal" value="90" min="0">
                             </div>
                             <div class="form-group">
-                                <label for="carbs-goal">碳水化合物目标 (克):</label>
+                                <label for="carbs-goal" data-lang="carbs-goal-label">碳水化合物目标 (克):</label>
                                 <input type="number" id="carbs-goal" value="250" min="0">
                             </div>
                             <div class="form-group">
-                                <label for="fat-goal">脂肪目标 (克):</label>
+                                <label for="fat-goal" data-lang="fat-goal-label">脂肪目标 (克):</label>
                                 <input type="number" id="fat-goal" value="65" min="0">
                             </div>
                             <div class="form-action">
-                                <button id="save-goals">保存目标</button>
+                                <button id="save-goals" data-lang="save-goals">保存目标</button>
                             </div>
                             <div class="calorie-summary">
-                                <p>根据您的目标，每日总卡路里摄入量应为 <span id="total-calories-goal">1945</span> 大卡</p>
-                                <p class="calorie-formula">计算公式：蛋白质(g) × 4 + 碳水化合物(g) × 4 + 脂肪(g) × 9</p>
+                                <p><span data-lang="calorie-summary">根据您的目标，每日总卡路里摄入量应为</span> <span id="total-calories-goal">1945</span> <span data-lang="calories">大卡</span></p>
+                                <p class="calorie-formula" data-lang="calorie-formula">计算公式：蛋白质(g) × 4 + 碳水化合物(g) × 4 + 脂肪(g) × 9</p>
                             </div>
                         </div>
                     </div>
@@ -77,21 +79,21 @@
 
             <!-- 今日营养摄入概览 -->
             <section class="card" id="nutrition-overview">
-                <h2>今日营养摄入</h2>
+                <h2 data-lang="nutrition-overview">今日营养摄入</h2>
                 <div class="nutrition-stats">
                     <div class="calories-circle">
                         <canvas id="calories-chart"></canvas>
                         <div class="calories-info">
                             <span class="calories-consumed" id="calories-consumed">0</span>
                             <span class="calories-total" id="calories-total">/ 0</span>
-                            <span class="calories-unit">卡路里</span>
+                            <span class="calories-unit" data-lang="calories-unit">卡路里</span>
                         </div>
                     </div>
                     
                     <div class="nutrition-bars">
                         <div class="nutrition-item">
                             <div class="nutrition-label">
-                                <span>蛋白质</span>
+                                <span data-lang="protein">蛋白质</span>
                                 <span class="nutrition-value" id="protein-value">0g / 0g</span>
                             </div>
                             <div class="progress-container">
@@ -101,7 +103,7 @@
                         
                         <div class="nutrition-item">
                             <div class="nutrition-label">
-                                <span>碳水化合物</span>
+                                <span data-lang="carbs">碳水化合物</span>
                                 <span class="nutrition-value" id="carbs-value">0g / 0g</span>
                             </div>
                             <div class="progress-container">
@@ -111,7 +113,7 @@
                         
                         <div class="nutrition-item">
                             <div class="nutrition-label">
-                                <span>脂肪</span>
+                                <span data-lang="fat">脂肪</span>
                                 <span class="nutrition-value" id="fat-value">0g / 0g</span>
                             </div>
                             <div class="progress-container">
@@ -124,140 +126,140 @@
 
             <!-- 营养成分分布 -->
             <section class="card" id="nutrition-distribution">
-                <h2>营养成分分布</h2>
+                <h2 data-lang="nutrition-distribution">营养成分分布</h2>
                 <div class="chart-container">
                     <canvas id="nutrition-chart"></canvas>
                 </div>
                 <div class="nutrition-tips">
-                    <p>理想分布: 蛋白质 25-30%, 碳水化合物 45-55%, 脂肪 20-30%</p>
+                    <p data-lang="ideal-distribution">理想分布: 蛋白质 25-30%, 碳水化合物 45-55%, 脂肪 20-30%</p>
                 </div>
             </section>
 
             <!-- 今日餐食记录 -->
             <section class="card" id="meal-tracking">
-                <h2>今日餐食记录</h2>
+                <h2 data-lang="meal-tracking">今日餐食记录</h2>
                 <div class="meal-tabs">
-                    <button class="meal-tab-btn active" data-meal="breakfast">早餐</button>
-                    <button class="meal-tab-btn" data-meal="lunch">午餐</button>
-                    <button class="meal-tab-btn" data-meal="dinner">晚餐</button>
-                    <button class="meal-tab-btn" data-meal="snack">加餐</button>
+                    <button class="meal-tab-btn active" data-meal="breakfast" data-lang="breakfast">早餐</button>
+                    <button class="meal-tab-btn" data-meal="lunch" data-lang="lunch">午餐</button>
+                    <button class="meal-tab-btn" data-meal="dinner" data-lang="dinner">晚餐</button>
+                    <button class="meal-tab-btn" data-meal="snack" data-lang="snack">加餐</button>
                 </div>
                 
                 <div class="meal-tab-content active" id="breakfast-content">
                     <div class="meal-form">
-                        <h3>添加早餐食物</h3>
+                        <h3 data-lang="add-breakfast">添加早餐食物</h3>
                         <div class="form-row">
                             <input type="text" id="breakfast-food" placeholder="食物名称">
                             <input type="number" id="breakfast-protein" placeholder="蛋白质(g)" min="0">
                             <input type="number" id="breakfast-carbs" placeholder="碳水(g)" min="0">
                             <input type="number" id="breakfast-fat" placeholder="脂肪(g)" min="0">
-                            <button id="add-breakfast">添加</button>
+                            <button id="add-breakfast" data-lang="add">添加</button>
                         </div>
                     </div>
                     <div class="meal-list" id="breakfast-list">
-                        <div class="empty-meal">还没有添加早餐食物</div>
+                        <div class="empty-meal"><span data-lang="empty-meal-prefix">还没有添加</span><span data-lang="breakfast">早餐</span><span data-lang="empty-meal-suffix">食物</span></div>
                     </div>
                     <div class="meal-summary" id="breakfast-summary">
-                        <div class="summary-item">总蛋白质: <span id="breakfast-total-protein">0</span>g</div>
-                        <div class="summary-item">总碳水: <span id="breakfast-total-carbs">0</span>g</div>
-                        <div class="summary-item">总脂肪: <span id="breakfast-total-fat">0</span>g</div>
-                        <div class="summary-item">总卡路里: <span id="breakfast-total-calories">0</span>大卡</div>
+                        <div class="summary-item"><span data-lang="total-protein">总蛋白质:</span> <span id="breakfast-total-protein">0</span>g</div>
+                        <div class="summary-item"><span data-lang="total-carbs">总碳水:</span> <span id="breakfast-total-carbs">0</span>g</div>
+                        <div class="summary-item"><span data-lang="total-fat">总脂肪:</span> <span id="breakfast-total-fat">0</span>g</div>
+                        <div class="summary-item"><span data-lang="total-calories">总卡路里:</span> <span id="breakfast-total-calories">0</span><span data-lang="calories">大卡</span></div>
                     </div>
                 </div>
                 
                 <div class="meal-tab-content" id="lunch-content">
                     <div class="meal-form">
-                        <h3>添加午餐食物</h3>
+                        <h3 data-lang="add-lunch">添加午餐食物</h3>
                         <div class="form-row">
                             <input type="text" id="lunch-food" placeholder="食物名称">
                             <input type="number" id="lunch-protein" placeholder="蛋白质(g)" min="0">
                             <input type="number" id="lunch-carbs" placeholder="碳水(g)" min="0">
                             <input type="number" id="lunch-fat" placeholder="脂肪(g)" min="0">
-                            <button id="add-lunch">添加</button>
+                            <button id="add-lunch" data-lang="add">添加</button>
                         </div>
                     </div>
                     <div class="meal-list" id="lunch-list">
-                        <div class="empty-meal">还没有添加午餐食物</div>
+                        <div class="empty-meal"><span data-lang="empty-meal-prefix">还没有添加</span><span data-lang="lunch">午餐</span><span data-lang="empty-meal-suffix">食物</span></div>
                     </div>
                     <div class="meal-summary" id="lunch-summary">
-                        <div class="summary-item">总蛋白质: <span id="lunch-total-protein">0</span>g</div>
-                        <div class="summary-item">总碳水: <span id="lunch-total-carbs">0</span>g</div>
-                        <div class="summary-item">总脂肪: <span id="lunch-total-fat">0</span>g</div>
-                        <div class="summary-item">总卡路里: <span id="lunch-total-calories">0</span>大卡</div>
+                        <div class="summary-item"><span data-lang="total-protein">总蛋白质:</span> <span id="lunch-total-protein">0</span>g</div>
+                        <div class="summary-item"><span data-lang="total-carbs">总碳水:</span> <span id="lunch-total-carbs">0</span>g</div>
+                        <div class="summary-item"><span data-lang="total-fat">总脂肪:</span> <span id="lunch-total-fat">0</span>g</div>
+                        <div class="summary-item"><span data-lang="total-calories">总卡路里:</span> <span id="lunch-total-calories">0</span><span data-lang="calories">大卡</span></div>
                     </div>
                 </div>
                 
                 <div class="meal-tab-content" id="dinner-content">
                     <div class="meal-form">
-                        <h3>添加晚餐食物</h3>
+                        <h3 data-lang="add-dinner">添加晚餐食物</h3>
                         <div class="form-row">
                             <input type="text" id="dinner-food" placeholder="食物名称">
                             <input type="number" id="dinner-protein" placeholder="蛋白质(g)" min="0">
                             <input type="number" id="dinner-carbs" placeholder="碳水(g)" min="0">
                             <input type="number" id="dinner-fat" placeholder="脂肪(g)" min="0">
-                            <button id="add-dinner">添加</button>
+                            <button id="add-dinner" data-lang="add">添加</button>
                         </div>
                     </div>
                     <div class="meal-list" id="dinner-list">
-                        <div class="empty-meal">还没有添加晚餐食物</div>
+                        <div class="empty-meal"><span data-lang="empty-meal-prefix">还没有添加</span><span data-lang="dinner">晚餐</span><span data-lang="empty-meal-suffix">食物</span></div>
                     </div>
                     <div class="meal-summary" id="dinner-summary">
-                        <div class="summary-item">总蛋白质: <span id="dinner-total-protein">0</span>g</div>
-                        <div class="summary-item">总碳水: <span id="dinner-total-carbs">0</span>g</div>
-                        <div class="summary-item">总脂肪: <span id="dinner-total-fat">0</span>g</div>
-                        <div class="summary-item">总卡路里: <span id="dinner-total-calories">0</span>大卡</div>
+                        <div class="summary-item"><span data-lang="total-protein">总蛋白质:</span> <span id="dinner-total-protein">0</span>g</div>
+                        <div class="summary-item"><span data-lang="total-carbs">总碳水:</span> <span id="dinner-total-carbs">0</span>g</div>
+                        <div class="summary-item"><span data-lang="total-fat">总脂肪:</span> <span id="dinner-total-fat">0</span>g</div>
+                        <div class="summary-item"><span data-lang="total-calories">总卡路里:</span> <span id="dinner-total-calories">0</span><span data-lang="calories">大卡</span></div>
                     </div>
                 </div>
                 
                 <div class="meal-tab-content" id="snack-content">
                     <div class="meal-form">
-                        <h3>添加加餐食物</h3>
+                        <h3 data-lang="add-snack">添加加餐食物</h3>
                         <div class="form-row">
                             <input type="text" id="snack-food" placeholder="食物名称">
                             <input type="number" id="snack-protein" placeholder="蛋白质(g)" min="0">
                             <input type="number" id="snack-carbs" placeholder="碳水(g)" min="0">
                             <input type="number" id="snack-fat" placeholder="脂肪(g)" min="0">
-                            <button id="add-snack">添加</button>
+                            <button id="add-snack" data-lang="add">添加</button>
                         </div>
                     </div>
                     <div class="meal-list" id="snack-list">
-                        <div class="empty-meal">还没有添加加餐食物</div>
+                        <div class="empty-meal"><span data-lang="empty-meal-prefix">还没有添加</span><span data-lang="snack">加餐</span><span data-lang="empty-meal-suffix">食物</span></div>
                     </div>
                     <div class="meal-summary" id="snack-summary">
-                        <div class="summary-item">总蛋白质: <span id="snack-total-protein">0</span>g</div>
-                        <div class="summary-item">总碳水: <span id="snack-total-carbs">0</span>g</div>
-                        <div class="summary-item">总脂肪: <span id="snack-total-fat">0</span>g</div>
-                        <div class="summary-item">总卡路里: <span id="snack-total-calories">0</span>大卡</div>
+                        <div class="summary-item"><span data-lang="total-protein">总蛋白质:</span> <span id="snack-total-protein">0</span>g</div>
+                        <div class="summary-item"><span data-lang="total-carbs">总碳水:</span> <span id="snack-total-carbs">0</span>g</div>
+                        <div class="summary-item"><span data-lang="total-fat">总脂肪:</span> <span id="snack-total-fat">0</span>g</div>
+                        <div class="summary-item"><span data-lang="total-calories">总卡路里:</span> <span id="snack-total-calories">0</span><span data-lang="calories">大卡</span></div>
                     </div>
                 </div>
             </section>
             
             <!-- 体重记录 -->
             <section class="card" id="weight-tracking">
-                <h2>体重记录</h2>
+                <h2 data-lang="weight-tracking">体重记录</h2>
                 <div class="weight-form">
                     <div class="form-group">
-                        <label for="weight-input">当日体重 (kg):</label>
+                        <label for="weight-input" data-lang="weight-input-label">当日体重 (kg):</label>
                         <input type="number" id="weight-input" step="0.1" min="0" placeholder="输入体重">
                     </div>
                     <div class="form-action">
-                        <button id="save-weight">保存体重</button>
-                        <button id="show-weight-records" class="secondary-btn">查看历史记录</button>
+                        <button id="save-weight" data-lang="save-weight">保存体重</button>
+                        <button id="show-weight-records" class="secondary-btn" data-lang="view-history">查看历史记录</button>
                     </div>
                 </div>
                 <div class="weight-history">
-                    <h3>体重趋势</h3>
+                    <h3 data-lang="weight-trend">体重趋势</h3>
                     <div class="chart-controls">
-                        <button class="chart-period-btn active" data-period="week">周视图</button>
-                        <button class="chart-period-btn" data-period="biweek">双周视图</button>
-                        <button class="chart-period-btn" data-period="month">月视图</button>
+                        <button class="chart-period-btn active" data-period="week" data-lang="week-view">周视图</button>
+                        <button class="chart-period-btn" data-period="biweek" data-lang="biweek-view">双周视图</button>
+                        <button class="chart-period-btn" data-period="month" data-lang="month-view">月视图</button>
                     </div>
                     <div class="chart-container">
                         <canvas id="weight-chart"></canvas>
                     </div>
                 </div>
                 <div class="weight-tips">
-                    <p>体重记录将在趋势图中显示，最多保存3个月数据</p>
+                    <p data-lang="weight-tip">体重记录将在趋势图中显示，最多保存3个月数据</p>
                 </div>
             </section>
 
@@ -265,7 +267,7 @@
             <div id="weight-records-modal" class="modal">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h2>体重历史记录</h2>
+                        <h2 data-lang="modal-weight">体重历史记录</h2>
                         <span class="close-modal">&times;</span>
                     </div>
                     <div class="modal-body">
@@ -278,37 +280,37 @@
 
             <!-- 营养知识小贴士 -->
             <section class="card" id="nutrition-tips">
-                <h2>营养小贴士</h2>
+                <h2 data-lang="nutrition-tips">三大营养素介绍</h2>
                 <div class="tips-container">
                     <div class="tip">
-                        <div class="tip-icon">💧</div>
+                        <div class="tip-icon">🍚</div>
                         <div class="tip-content">
-                            <h3>水分摄入</h3>
-                            <p>每天应饮用至少8杯水(约2升)，保持身体充分水合，有助于新陈代谢和营养吸收。</p>
+                            <h3 data-lang="carb-title">碳水化合物</h3>
+                            <p data-lang="carb-desc">碳水是人体主要能量来源，每克提供4卡路里。大脑和神经系统主要依赖葡萄糖工作。优质碳水来源包括全谷物、豆类、水果和蔬菜，它们富含纤维和微量营养素。</p>
                         </div>
                     </div>
                     
                     <div class="tip">
-                        <div class="tip-icon">🌈</div>
+                        <div class="tip-icon">🥩</div>
                         <div class="tip-content">
-                            <h3>食物多样化</h3>
-                            <p>每天摄入不同颜色的蔬果，确保获取各种必要的维生素、矿物质和抗氧化剂。</p>
+                            <h3 data-lang="protein-title">蛋白质</h3>
+                            <p data-lang="protein-desc">蛋白质是肌肉、器官和免疫系统的基石，每克提供4卡路里。它们对肌肉修复和生长至关重要，促进饱腹感并支持新陈代谢。优质蛋白来源包括瘦肉、鱼、蛋、豆类和坚果。</p>
                         </div>
                     </div>
                     
                     <div class="tip">
-                        <div class="tip-icon">⏰</div>
+                        <div class="tip-icon">🥑</div>
                         <div class="tip-content">
-                            <h3>进餐规律</h3>
-                            <p>规律进餐有助于控制血糖水平，避免过度饥饿导致的过量进食。</p>
+                            <h3 data-lang="fat-title">脂肪</h3>
+                            <p data-lang="fat-desc">脂肪是高能量营养素，每克提供9卡路里。它们对激素生产、大脑功能和脂溶性维生素(A、D、E、K)的吸收至关重要。健康脂肪来源包括橄榄油、鳄梨、坚果和鱼类中的omega-3脂肪酸。</p>
                         </div>
                     </div>
                     
                     <div class="tip">
-                        <div class="tip-icon">🥦</div>
+                        <div class="tip-icon">⚖️</div>
                         <div class="tip-content">
-                            <h3>植物性蛋白</h3>
-                            <p>尝试将部分动物蛋白替换为植物性蛋白(如豆类、坚果)，有益心脏健康。</p>
+                            <h3 data-lang="balance-title">平衡摄入</h3>
+                            <p data-lang="balance-desc">均衡饮食应包括所有三种宏量营养素。一般推荐摄入比例为：蛋白质25-30%，碳水化合物45-55%，脂肪20-30%，但最佳比例因个人目标、活动水平和代谢状况而异。</p>
                         </div>
                     </div>
                 </div>
@@ -316,7 +318,7 @@
         </main>
 
         <footer>
-            <p>© 2023 健康营养追踪 - 仅供参考，不构成医疗建议</p>
+            <p data-lang="footer">© 2023 健康营养追踪 - 仅供参考，不构成医疗建议</p>
         </footer>
     </div>
 

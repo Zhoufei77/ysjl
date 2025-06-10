@@ -179,7 +179,21 @@ function updateDisplayDate() {
     const month = dateObj.getMonth() + 1;
     const day = dateObj.getDate();
     
-    document.getElementById('display-current-date').textContent = `${year}年${month}月${day}日`;
+    // 获取日期显示元素
+    const dateDisplay = document.getElementById('display-current-date');
+    
+    // 根据当前语言设置不同格式的日期
+    if (window.currentLang === 'en') {
+        // 英文日期格式：Month Day, Year
+        const months = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+        dateDisplay.textContent = `${months[month-1]} ${day}, ${year}`;
+    } else {
+        // 中文日期格式：YYYY年MM月DD日
+        dateDisplay.textContent = `${year}年${month}月${day}日`;
+    }
 }
 
 // 确保当前日期的数据结构存在
@@ -397,6 +411,20 @@ function initNutritionChart() {
 // 更新营养成分分布图
 function updateNutritionChart() {
     const currentDayData = appData.dailyRecords[appData.currentDate] || { consumed: { protein: 0, carbs: 0, fat: 0 } };
+    
+    // 根据当前语言设置标签
+    if (window.langData && window.currentLang) {
+        // 更新X轴标签（蛋白质、碳水化合物、脂肪）
+        window.nutritionChart.data.labels = [
+            langData['protein'][currentLang] || '蛋白质',
+            langData['carbs'][currentLang] || '碳水化合物',
+            langData['fat'][currentLang] || '脂肪'
+        ];
+        
+        // 更新数据集标签（当前摄入、目标摄入）
+        window.nutritionChart.data.datasets[0].label = currentLang === 'en' ? 'Current Intake' : '当前摄入';
+        window.nutritionChart.data.datasets[1].label = currentLang === 'en' ? 'Target Intake' : '目标摄入';
+    }
     
     // 更新当前摄入数据
     window.nutritionChart.data.datasets[0].data = [
@@ -695,65 +723,45 @@ function initWeightChart() {
 
 // 更新体重图表
 function updateWeightChart() {
-    // 获取体重记录数据
+    // 转换体重记录数据为按日期存储
+    const dateWeightMap = {};
     const keys = Object.keys(appData.weightRecords).sort();
-    let labels = [];
-    let data = [];
     
-    // 根据选择的视图模式处理数据
-    if (appData.weightChartMode === 'week') {
-        // 周视图: 显示每周数据
-        keys.forEach(key => {
-            const [year, week] = key.split('-');
-            labels.push(`第${week}周`);
-            data.push(appData.weightRecords[key]);
-        });
-    } else if (appData.weightChartMode === 'biweek') {
-        // 双周视图: 每两周显示一个数据点
-        for (let i = 0; i < keys.length; i += 2) {
-            const key = keys[i];
-            const [year, week] = key.split('-');
-            
-            // 如果有下一个数据点，则计算平均值
-            if (i + 1 < keys.length) {
-                const nextKey = keys[i + 1];
-                const avgWeight = (appData.weightRecords[key] + appData.weightRecords[nextKey]) / 2;
-                labels.push(`第${week}-${parseInt(week) + 1}周`);
-                data.push(avgWeight);
-            } else {
-                // 如果是最后一个点，直接使用
-                labels.push(`第${week}周`);
-                data.push(appData.weightRecords[key]);
-            }
-        }
+    // 首先，将周记录转换为日期记录
+    keys.forEach(key => {
+        const [year, week] = key.split('-');
+        const weekDate = getDateFromWeek(parseInt(year), parseInt(week));
+        const dateKey = formatDate(weekDate);
+        dateWeightMap[dateKey] = appData.weightRecords[key];
+    });
+    
+    // 按日期排序
+    const dateKeys = Object.keys(dateWeightMap).sort();
+    
+    // 根据选择的视图模式确定要显示的天数
+    let daysToShow = 7; // 默认周视图
+    if (appData.weightChartMode === 'biweek') {
+        daysToShow = 14;
     } else if (appData.weightChartMode === 'month') {
-        // 月视图: 按月份分组
-        const monthData = {};
-        
-        keys.forEach(key => {
-            const [year, week] = key.split('-');
-            const date = getDateFromWeek(parseInt(year), parseInt(week));
-            const monthKey = `${date.getFullYear()}-${date.getMonth() + 1}`;
-            
-            if (!monthData[monthKey]) {
-                monthData[monthKey] = {
-                    sum: 0,
-                    count: 0
-                };
-            }
-            
-            monthData[monthKey].sum += appData.weightRecords[key];
-            monthData[monthKey].count++;
-        });
-        
-        // 计算每月平均值
-        Object.keys(monthData).sort().forEach(monthKey => {
-            const [year, month] = monthKey.split('-');
-            const avg = monthData[monthKey].sum / monthData[monthKey].count;
-            labels.push(`${year}年${month}月`);
-            data.push(avg);
-        });
+        daysToShow = 30;
     }
+    
+    // 只取最近的N天数据
+    const recentDateKeys = dateKeys.slice(-daysToShow);
+    
+    // 准备图表数据
+    const labels = [];
+    const data = [];
+    
+    // 格式化日期显示
+    recentDateKeys.forEach(dateKey => {
+        const date = new Date(dateKey);
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+        const year = date.getFullYear();
+        labels.push(`${month}/${day}/${year}`);
+        data.push(dateWeightMap[dateKey]);
+    });
     
     // 更新图表数据
     window.weightChart.data.labels = labels;
@@ -773,11 +781,27 @@ function updateWeightChart() {
 
 // 从周数获取日期
 function getDateFromWeek(year, week) {
-    const firstDayOfYear = new Date(year, 0, 1);
-    const daysOffset = (week - 1) * 7;
-    const resultDate = new Date(firstDayOfYear);
-    resultDate.setDate(firstDayOfYear.getDate() + daysOffset);
-    return resultDate;
+    // 使用ISO标准：每年第一周是包含1月4日的那一周
+    // 第1周的星期一是该年第一个星期一
+    const simple = new Date(year, 0, 1 + (week - 1) * 7);
+    const dayOfWeek = simple.getDay();
+    const isoWeekStart = simple;
+    
+    // 调整到当周的星期一
+    // JavaScript中0是周日，1是周一，我们需要找到周一
+    if (dayOfWeek <= 0) { // 0是周日
+        isoWeekStart.setDate(simple.getDate() - simple.getDay() + 1);
+    } else {
+        isoWeekStart.setDate(simple.getDate() - simple.getDay() + 8);
+    }
+    
+    const today = new Date();
+    // 如果计算出的日期是未来日期，返回今天的日期
+    if (isoWeekStart > today) {
+        return today;
+    }
+    
+    return isoWeekStart;
 }
 
 // 初始化体重历史记录列表
@@ -801,7 +825,8 @@ function updateWeightRecordsList() {
     if (keys.length === 0) {
         const emptyMessage = document.createElement('div');
         emptyMessage.className = 'empty-records';
-        emptyMessage.textContent = '暂无体重记录';
+        emptyMessage.setAttribute('data-lang', 'empty-weight');
+        emptyMessage.textContent = langData['empty-weight'][currentLang] || '暂无体重记录';
         recordsList.appendChild(emptyMessage);
         return;
     }
@@ -810,14 +835,33 @@ function updateWeightRecordsList() {
         const [year, week] = key.split('-');
         const weight = appData.weightRecords[key];
         
+        // 从周号获取日期
+        const weekDate = getDateFromWeek(parseInt(year), parseInt(week));
+        
+        // 根据语言格式化日期
+        let dateText;
+        if (window.currentLang === 'en') {
+            const months = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
+            const month = weekDate.getMonth();
+            const day = weekDate.getDate();
+            dateText = `${months[month]} ${day}, ${year}`;
+        } else {
+            const month = weekDate.getMonth() + 1;
+            const day = weekDate.getDate();
+            dateText = `${year}年${month}月${day}日`;
+        }
+        
         // 创建记录项
         const recordItem = document.createElement('div');
         recordItem.className = 'weight-record-item';
         recordItem.innerHTML = `
-            <div class="weight-record-date">${year}年第${week}周</div>
+            <div class="weight-record-date">${dateText}</div>
             <div class="weight-record-value">${weight} kg</div>
             <div class="weight-record-actions">
-                <button class="delete-weight-record" data-week="${key}">删除</button>
+                <button class="delete-weight-record" data-week="${key}" data-lang="delete">${langData['delete'][currentLang] || '删除'}</button>
             </div>
         `;
         
@@ -827,8 +871,32 @@ function updateWeightRecordsList() {
 
 // 删除体重记录
 function deleteWeightRecord(weekKey) {
+    // 获取对应的日期
+    const [year, week] = weekKey.split('-');
+    const weekDate = getDateFromWeek(parseInt(year), parseInt(week));
+    
+    // 根据语言格式化日期文本
+    let dateText;
+    if (window.currentLang === 'en') {
+        const months = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+        const month = weekDate.getMonth();
+        const day = weekDate.getDate();
+        dateText = `${months[month]} ${day}, ${year}`;
+    } else {
+        const month = weekDate.getMonth() + 1;
+        const day = weekDate.getDate();
+        dateText = `${year}年${month}月${day}日`;
+    }
+    
+    // 多语言确认删除消息
+    const confirmPrefix = langData['delete-confirm'][currentLang] || '确定要删除';
+    const confirmSuffix = langData['delete-confirm-suffix'][currentLang] || '的体重记录吗？';
+    
     // 确认删除
-    if (confirm(`确定要删除 ${weekKey.replace('-', '年第')}周 的体重记录吗？`)) {
+    if (confirm(`${confirmPrefix} ${dateText} ${confirmSuffix}`)) {
         // 删除记录
         delete appData.weightRecords[weekKey];
         
@@ -878,22 +946,41 @@ function updateMealLists() {
             // 如果没有食物，显示空状态
             const emptyDiv = document.createElement('div');
             emptyDiv.className = 'empty-meal';
-            emptyDiv.textContent = `还没有添加${getMealTypeName(mealType)}食物`;
+            
+            // 使用支持多语言的方式创建空消息
+            const prefixSpan = document.createElement('span');
+            prefixSpan.setAttribute('data-lang', 'empty-meal-prefix');
+            prefixSpan.textContent = langData['empty-meal-prefix'][currentLang] || '还没有添加';
+            
+            const mealNameSpan = document.createElement('span');
+            mealNameSpan.setAttribute('data-lang', mealType);
+            mealNameSpan.textContent = langData[mealType][currentLang] || getMealTypeName(mealType);
+            
+            const suffixSpan = document.createElement('span');
+            suffixSpan.setAttribute('data-lang', 'empty-meal-suffix');
+            suffixSpan.textContent = langData['empty-meal-suffix'][currentLang] || '食物';
+            
+            emptyDiv.appendChild(prefixSpan);
+            emptyDiv.appendChild(mealNameSpan);
+            emptyDiv.appendChild(suffixSpan);
+            
             mealList.appendChild(emptyDiv);
         } else {
             // 添加每个食物项
             mealFoods.forEach(food => {
                 const foodItem = document.createElement('div');
                 foodItem.className = 'food-item';
+                
+                // 使用支持多语言的方式创建食物项
                 foodItem.innerHTML = `
                     <div class="food-name">${food.name}</div>
                     <div class="food-macros">
-                        <span>蛋白质: ${food.protein}g</span>
-                        <span>碳水: ${food.carbs}g</span>
-                        <span>脂肪: ${food.fat}g</span>
+                        <span><span data-lang="protein">${langData['protein'][currentLang] || '蛋白质'}</span>: ${food.protein}g</span>
+                        <span><span data-lang="carbs">${langData['carbs'][currentLang] || '碳水'}</span>: ${food.carbs}g</span>
+                        <span><span data-lang="fat">${langData['fat'][currentLang] || '脂肪'}</span>: ${food.fat}g</span>
                     </div>
                     <div class="food-actions">
-                        <button class="delete-food" data-id="${food.id}">删除</button>
+                        <button class="delete-food" data-id="${food.id}" data-lang="delete">${langData['delete'][currentLang] || '删除'}</button>
                     </div>
                 `;
                 
@@ -923,6 +1010,12 @@ function updateMealSummary(mealType) {
 
 // 获取餐食类型的中文名称
 function getMealTypeName(mealType) {
+    // 如果存在语言数据且当前语言已设置，使用翻译
+    if (window.langData && window.langData[mealType] && window.currentLang) {
+        return window.langData[mealType][window.currentLang];
+    }
+    
+    // 否则使用默认中文名称
     const names = {
         'breakfast': '早餐',
         'lunch': '午餐',
@@ -982,4 +1075,18 @@ function loadDataFromLocalStorage() {
             }
         });
     }
-} 
+}
+
+// 初始化语言功能
+document.addEventListener('DOMContentLoaded', function() {
+    // 添加语言脚本
+    const langScript = document.createElement('script');
+    langScript.src = 'lang.js';
+    langScript.onload = function() {
+        // 语言脚本加载完成后初始化语言
+        if (typeof initLanguage === 'function') {
+            initLanguage();
+        }
+    };
+    document.head.appendChild(langScript);
+}); 
